@@ -1,0 +1,13 @@
+{
+  "name": "polyrhythm-generator",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "audiolet": "1.0.0",
+    "babel-core": "^5.8.22",
+    "babel-loader": "^5.3.2",
+    "optimist": "^0.6.1",
+    "webpack": "^1.11.0",
+    "webpack-dev-server": "^1.10.1"
+  }
+}
