@@ -1,11 +1,13 @@
-import { Audiolet, AudioletGroup, AudioletParameter } from 'audiolet/core';
-import { Sine } from 'audiolet/dsp';
 import { PSeries } from 'audiolet/pattern';
 import { MidiGroup } from 'audiolet-midi';
 
+// TODO: at the moment, this only generates a "kick" and "snare" bar,
+// denotated by MIDI values 0 and 1 respectively. this is not appropriate for
+// a final implementation but works fine for tests.
+
 // for a formulaic explanation of polythythms,
 // see https://www.youtube.com/watch?v=NOWaD8Abq90
-class Generator extends MidiGroup {
+class PolyrhythmGenerator extends MidiGroup {
 
   constructor(audiolet, beatsPerMeasure = 3, noteType = 4) {
     super(audiolet, 0, 1, null, 0);
@@ -33,7 +35,7 @@ class Generator extends MidiGroup {
     })();
 
     scheduler.play([new PSeries(kickBar, Infinity)],  1 / x, (on) => {
-      this.midiOut.send(on? 144: 128, 220, 255);
+      this.midiOut.send(on? 144: 128, 0, 255);
     });
 
     // accent every n subdivided notes
@@ -47,72 +49,10 @@ class Generator extends MidiGroup {
 
     // divide each beat by x
     scheduler.play([new PSeries(snareBar, Infinity)], 1 / x, (on) => {
-      this.midiOut.send(on? 144: 128, 440, 255);
+      this.midiOut.send(on? 144: 128, 1, 255);
     });
   }
 
 }
 
-let audiolet = new Audiolet();
-let generator = new Generator(audiolet);
-generator.play();
-
-
-////////////
-////////////
-////////////
-
-/*
-
-class TestInstrument extends MidiGroup {
-
-  constructor(audiolet) {
-    super(audiolet, 1, 1, 0, null);
-    this.voices = new AudioletParameter(this, null, {});
-  }
-
-  addVoice(freq) {
-    let audiolet = this.audiolet;
-    let voices = this.voices;
-    let voices_value = voices.getValue();
-    let output = this.outputs[0];
-
-    if (!voices_value[freq]) {
-      let sine = new Sine(audiolet, freq);
-      voices_value[freq] = sine;
-      voices.setValue(voices_value);
-      sine.connect(output);
-    }
-  }
-
-  removeVoice(freq) {
-    let voices = this.voices;
-    let voices_value = voices.getValue();
-    let voice = voices_value[freq];
-    let output = this.outputs[0];
-
-    if (voice) {
-      delete voices_value[freq];
-      voices.setValue(voices_value);
-      voice.disconnect(output);
-    }
-  }
-
-  noteOn(key, vel) {
-    console.log('noteOn', key);
-    this.addVoice(key);
-  }
-
-  noteOff(key, vel) {
-    console.log('noteOff', key);
-    this.removeVoice(key);
-  }
-
-}
-
-let testInstrument = new TestInstrument(audiolet);
-
-generator.midiOut.connect(testInstrument);
-testInstrument.connect(audiolet.output);
-
-*/
+export default { PolyrhythmGenerator };
